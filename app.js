@@ -5,13 +5,18 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var exphbs = require('express-handlebars');
+var arDrone = require('ar-drone');
+var dronestream = require("dronestream")
+var client = arDrone.createClient();
 
 
-var routes = require('./routes/index');
+
+//var routes = require('./routes/index');
 var users = require('./routes/user');
 
 var app = express();
 
+var server = require("http").createServer(app);
 //var server = require('http').createServer(app);
 
 var env = process.env.NODE_ENV || 'development';
@@ -36,9 +41,95 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+//app.use('/', routes);
 app.use('/users', users);
 
+//*******EXPERIMENT************
+
+//require("dronestream").listen(server)
+
+    app.get('/start', function(req, res) {
+        // res.render('start', { title: 'Start' });
+        //var pngStream = arDrone.createClient().getPngStream();
+        // var client = arDrone.createClient();
+        // client.disableEmergency();
+
+        client.disableEmergency();
+        client.calibrate(0);
+
+        client
+            .after(3000, function() {
+                this.takeoff();
+            })
+        // .after(0, function() {
+        //     this.stop();
+        // })
+        // .after(0, function() {
+        //     this.calibrate(0);
+        // })
+        // .after(5000, function() {
+        //     this.clockwise(0.1);
+        // })
+        // .after(5000, function() {
+        //     this.stop();
+        // })
+        //     .after(5000, function() {
+        //         this.up(.25);
+        //     })
+        //     .after(3000, function() {
+        //         this.stop();
+        //     });
+        // .after(5000, function() {
+        //   this.clockwise(0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(5000, function() {
+        //   this.clockwise(-0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(5000, function() {
+        //   this.clockwise(-0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(1000, function() {
+        //   this.stop();
+        //   this.land();
+        // });
+
+    });
+
+    app.get('/end', function(req, res) {
+        // res.render('start', { title: 'Start' });
+        client.land();
+    });
+
+    app.get('/feed', function(req, res) {
+        console.log("dronestream is:")
+        console.log(dronestream);
+        //dronestream.listen
+        res.render('feed');
+    });
+
+
+
+
+// server.listen(8080, function() {
+//     console.log('Serving latest png on port 8080 ...');
+
+
+
+
+// });
+
+dronestream.listen(server)
+
+//*******END EXPERIMENT************
 
 /*
  * Important:
@@ -85,4 +176,10 @@ app.use(function(err, req, res, next) {
 });
 
 
-module.exports = app;
+server.listen(3000);
+
+
+
+
+
+// module.exports = app;

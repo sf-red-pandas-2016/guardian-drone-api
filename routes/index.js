@@ -2,37 +2,39 @@ var arDrone = require('ar-drone');
 var http = require('http');
 var express = require('express');
 var router = express.Router();
+var dronestream = require("dronestream")
 
 /* GET home page. */
 
 router.get('/', function(req, res) {
-    redirect('/start');
+    res.redirect('/start');
 });
 
 var client = arDrone.createClient();
 
-console.log('Connecting png stream ...');
-var pngStream = client.getPngStream();
+// console.log('Connecting png stream ...');
+// var pngStream = client.getPngStream();
 
-var lastPng;
-pngStream
-    .on('error', console.log)
-    .on('data', function(pngBuffer) {
-        lastPng = pngBuffer;
-    });
+// var lastPng;
+// pngStream
+//     .on('error', console.log)
+//     .on('data', function(pngBuffer) {
+//         lastPng = pngBuffer;
+//     });
 
-var server = http.createServer(function(req, res) {
-    if (!lastPng) {
-        res.writeHead(503);
-        res.end('Did not receive any png data yet.');
-        return;
-    }
+// var server = http.createServer(function(req, res) {
+//     if (!lastPng) {
+//         res.writeHead(503);
+//         res.end('Did not receive any png data yet.');
+//         return;
+//     }
 
-    res.writeHead(200, {
-        'Content-Type': 'image/png'
-    });
-    res.end(lastPng);
-});
+//     res.writeHead(200, {
+//         'Content-Type': 'image/png'
+//     });
+//     res.end(lastPng);
+// });
+server = require("http").createServer(app)
 
 server.listen(8080, function() {
     console.log('Serving latest png on port 8080 ...');
@@ -43,7 +45,7 @@ server.listen(8080, function() {
         //var pngStream = arDrone.createClient().getPngStream();
         // var client = arDrone.createClient();
         // client.disableEmergency();
-        
+
         client.disableEmergency();
         client.calibrate(0);
 
@@ -54,21 +56,21 @@ server.listen(8080, function() {
         // .after(0, function() {
         //     this.stop();
         // })
-        .after(0, function() {
-            this.calibrate(0);
-        })
+        // .after(0, function() {
+        //     this.calibrate(0);
+        // })
         // .after(5000, function() {
         //     this.clockwise(0.1);
         // })
-        .after(5000, function() {
-            this.stop();
-        })
-            .after(5000, function() {
-                this.up(.1);
-            })
-            .after(4000, function() {
-                this.stop();
-            });
+        // .after(5000, function() {
+        //     this.stop();
+        // })
+        //     .after(5000, function() {
+        //         this.up(.25);
+        //     })
+        //     .after(3000, function() {
+        //         this.stop();
+        //     });
         // .after(5000, function() {
         //   this.clockwise(0.5);
         // })
@@ -100,6 +102,9 @@ server.listen(8080, function() {
     });
 
     router.get('/feed', function(req, res) {
+        console.log("dronestream is:")
+        console.log(dronestream);
+        //dronestream.listen
         res.render('feed');
     });
 
