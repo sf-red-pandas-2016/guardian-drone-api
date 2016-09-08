@@ -102,9 +102,6 @@ server.listen(8080, function() {
     });
 
     router.get('/feed', function(req, res) {
-        console.log("dronestream is:")
-        console.log(dronestream);
-        //dronestream.listen
         res.render('feed');
     });
 

@@ -49,12 +49,9 @@ app.use('/users', users);
 //require("dronestream").listen(server)
 
     app.get('/start', function(req, res) {
-        // res.render('start', { title: 'Start' });
-        //var pngStream = arDrone.createClient().getPngStream();
-        // var client = arDrone.createClient();
-        // client.disableEmergency();
 
         client.disableEmergency();
+        client.ftrim();
         client.calibrate(0);
 
         client
@@ -65,12 +62,9 @@ app.use('/users', users);
         //     this.stop();
         // })
         // .after(0, function() {
-        //     this.calibrate(0);
+        //     this.up(.5);
         // })
-        // .after(5000, function() {
-        //     this.clockwise(0.1);
-        // })
-        // .after(5000, function() {
+        // .after(2000, function() {
         //     this.stop();
         // })
         //     .after(5000, function() {
@@ -105,9 +99,24 @@ app.use('/users', users);
     });
 
     app.get('/end', function(req, res) {
-        // res.render('start', { title: 'Start' });
         client.land();
     });
+
+    app.get('/walk', function(req, res) {
+        console.log(req.query)
+        // res.render('start', { title: 'Start' });
+        var time = parseInt(req.query.time) * 1000;
+
+        client
+        .after(0, function() {
+            this.front(.2);
+        })
+        .after(2000, function() {
+            this.stop();
+        })
+    });
+
+
 
     app.get('/feed', function(req, res) {
         console.log("dronestream is:")
