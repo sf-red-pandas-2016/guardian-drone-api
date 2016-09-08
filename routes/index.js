@@ -1,85 +1,109 @@
 var arDrone = require('ar-drone');
-var http    = require('http');
+var http = require('http');
 var express = require('express');
 var router = express.Router();
+var dronestream = require("dronestream")
 
 /* GET home page. */
 
 router.get('/', function(req, res) {
-  redirect('/start');
+    res.redirect('/start');
 });
 
-router.get('/start', function(req, res) {
-  // res.render('start', { title: 'Start' });
-//var pngStream = arDrone.createClient().getPngStream();
 var client = arDrone.createClient();
-client.disableEmergency();
 
-console.log('Connecting png stream ...');
-var pngStream = client.getPngStream();
+// console.log('Connecting png stream ...');
+// var pngStream = client.getPngStream();
 
-var lastPng;
-pngStream
-  .on('error', console.log)
-  .on('data', function(pngBuffer) {
-    lastPng = pngBuffer;
-  });
+// var lastPng;
+// pngStream
+//     .on('error', console.log)
+//     .on('data', function(pngBuffer) {
+//         lastPng = pngBuffer;
+//     });
 
-var server = http.createServer(function(req, res) {
-  if (!lastPng) {
-    res.writeHead(503);
-    res.end('Did not receive any png data yet.');
-    return;
-  }
+// var server = http.createServer(function(req, res) {
+//     if (!lastPng) {
+//         res.writeHead(503);
+//         res.end('Did not receive any png data yet.');
+//         return;
+//     }
 
-  res.writeHead(200, {'Content-Type': 'image/png'});
-  res.end(lastPng);
-});
+//     res.writeHead(200, {
+//         'Content-Type': 'image/png'
+//     });
+//     res.end(lastPng);
+// });
+server = require("http").createServer(app)
 
 server.listen(8080, function() {
-  console.log('Serving latest png on port 8080 ...');
-  client.takeoff();
+    console.log('Serving latest png on port 8080 ...');
 
-  client
-    .after(5000, function() {
-      this.clockwise(0.2);
-    })
-    .after(5000, function() {
-      this.stop();
+
+    router.get('/start', function(req, res) {
+        // res.render('start', { title: 'Start' });
+        //var pngStream = arDrone.createClient().getPngStream();
+        // var client = arDrone.createClient();
+        // client.disableEmergency();
+
+        client.disableEmergency();
+        client.calibrate(0);
+
+        client
+            .after(3000, function() {
+                this.takeoff();
+            })
+        // .after(0, function() {
+        //     this.stop();
+        // })
+        // .after(0, function() {
+        //     this.calibrate(0);
+        // })
+        // .after(5000, function() {
+        //     this.clockwise(0.1);
+        // })
+        // .after(5000, function() {
+        //     this.stop();
+        // })
+        //     .after(5000, function() {
+        //         this.up(.25);
+        //     })
+        //     .after(3000, function() {
+        //         this.stop();
+        //     });
+        // .after(5000, function() {
+        //   this.clockwise(0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(5000, function() {
+        //   this.clockwise(-0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(5000, function() {
+        //   this.clockwise(-0.5);
+        // })
+        // .after(5000, function() {
+        //   this.stop();
+        // })
+        // .after(1000, function() {
+        //   this.stop();
+        //   this.land();
+        // });
+
     });
-    // .after(5000, function() {
-    //   this.clockwise(0.5);
-    // })
-    // .after(5000, function() {
-    //   this.stop();
-    // })
-    // .after(5000, function() {
-    //   this.clockwise(-0.5);
-    // })
-    // .after(5000, function() {
-    //   this.stop();
-    // })
-    // .after(5000, function() {
-    //   this.clockwise(-0.5);
-    // })
-    // .after(5000, function() {
-    //   this.stop();
-    // })
-    // .after(1000, function() {
-    //   this.stop();
-    //   this.land();
-    // });
 
-});
+    router.get('/end', function(req, res) {
+        // res.render('start', { title: 'Start' });
+        client.land();
+    });
 
-router.get('/end', function(req, res) {
-  // res.render('start', { title: 'Start' });
-  client.land();
-});
-
-router.get('/feed', function(req, res) {
-  res.render('feed');
-});
+    router.get('/feed', function(req, res) {
+        res.render('feed');
+    });
 
 });
 
